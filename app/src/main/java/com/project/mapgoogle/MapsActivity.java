@@ -281,8 +281,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 return;
                             }
                             mMap.addMarker(new MarkerOptions().title(placesModel.getPlaceName()).position(new LatLng(placesModel.getLatitude(),placesModel.getLongitude())));
+
+
+//                            if (polylines != null) {
+//                                polylines.clear();
+//                            }
+//                            PolylineOptions polyOptions = new PolylineOptions();
+//                            LatLng polylineStartLatLng = null;
+//                            LatLng polylineEndLatLng = null;
+//                            polylines = new ArrayList<>();
+////                            for (int i = 0; i < placesModel.size(); i++) {
+//
+//                                    polyOptions.color(getResources().getColor(R.color.black));
+//                                    polyOptions.width(7);
+//                                    polyOptions.addAll(Collections.singleton(new LatLng(placesModel.getLatitude(), placesModel.getLongitude())));
+//                                    Polyline polyline = mMap.addPolyline(polyOptions);
+//                                    polylineStartLatLng = polyline.getPoints().get(0);
+//                                    int k = polyline.getPoints().size();
+//                                    polylineEndLatLng = polyline.getPoints().get(k - 1);
+//                                    polylines.add(polyline);
+//
+//                            MarkerOptions startMarker = new MarkerOptions();
+//                            startMarker.position(polylineStartLatLng);
+//                            startMarker.title("My Location");
+//                            mMap.addMarker(startMarker);
+//
+//                            MarkerOptions endMarker = new MarkerOptions();
+//                            endMarker.position(polylineEndLatLng);
+//                            endMarker.title("Destination");
+//                            mMap.addMarker(endMarker);
+
+//                            }
+
+
                         }
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currLocation, -5));
+
                     }
                 });
             }else {
@@ -561,7 +595,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 PlacesModel model = new PlacesModel(place.getName(), place.getAddress(), place.getAttributions().toString(), place.getLatLng().latitude, place.getLatLng().longitude);
                 viewmodal.insert(model);
                 Toast.makeText(this, "Place insert", Toast.LENGTH_SHORT).show();
-            } else {
+            }  else if (clickType.equals(Constants.ALL_ROUT)){
+                PlacesModel model = new PlacesModel(place.getName(), place.getAddress(), place.getAttributions().toString(), place.getLatLng().latitude, place.getLatLng().longitude);
+                viewmodal.insert(model);
+                Toast.makeText(this, "Place insert", Toast.LENGTH_SHORT).show();
+            }else {
                 PlacesModel model = new PlacesModel(place.getName(), place.getAddress(), place.getAttributions().toString(), place.getLatLng().latitude, place.getLatLng().longitude);
                 model.setId(id);
                 viewmodal.update(model);
