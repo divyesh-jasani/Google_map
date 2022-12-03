@@ -60,12 +60,13 @@ import java.util.List;
 public class PlaceListActivity extends AppCompatActivity {
 
     RecyclerView rvPlaceDetails;
+    TextView tvEmpty;
     private static final int ADD_COURSE_REQUEST = 1;
     private static final int EDIT_COURSE_REQUEST = 2;
     private static final int REQUEST_CODE = 1;
     private ViewModal viewmodal;
-ArrayList<Place> places = new ArrayList<>();
-ArrayList<PlacesModel> placesModels = new ArrayList<>();
+    ArrayList<Place> places = new ArrayList<>();
+    ArrayList<PlacesModel> placesModels = new ArrayList<>();
     FusedLocationProviderClient fusedLocationProviderClient;
     PlacesRVAdapter adapter;
 
@@ -74,6 +75,7 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_list);
 
+        tvEmpty = findViewById(R.id.tvEmpty);
         rvPlaceDetails = findViewById(R.id.rvPlaceDetails);
         rvPlaceDetails.setLayoutManager(new LinearLayoutManager(this));
         rvPlaceDetails.setHasFixedSize(true);
@@ -88,9 +90,16 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
             @Override
             public void onChanged(List<PlacesModel> models) {
 
+                if (models.size() > 0) {
+                    rvPlaceDetails.setVisibility(View.VISIBLE);
+                    tvEmpty.setVisibility(View.GONE);
+                } else {
+                    rvPlaceDetails.setVisibility(View.GONE);
+                    tvEmpty.setVisibility(View.VISIBLE);
+                }
                 adapter.submitList(models);
 
-                for (PlacesModel placesModel: models) {
+                for (PlacesModel placesModel : models) {
                     places.add(new Place() {
                         @Nullable
                         @Override
@@ -241,25 +250,25 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
         adapter.setOnItemClickListener(new PlacesRVAdapter.OnItemClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onItemClick(PlacesModel model,String clickType) {
+            public void onItemClick(PlacesModel model, String clickType) {
 
                 if (clickType.equals(Constants.VIEW_CLICK)) {
                     Intent intent = new Intent(PlaceListActivity.this, MapsActivity.class);
-                    intent.putExtra("address",model.getPlaceAddress());
-                    intent.putExtra("addComponent",model.getAddressComponent());
-                    intent.putExtra("name",model.getPlaceName());
-                    intent.putExtra("clickType",Constants.VIEW_CLICK);
+                    intent.putExtra("address", model.getPlaceAddress());
+                    intent.putExtra("addComponent", model.getAddressComponent());
+                    intent.putExtra("name", model.getPlaceName());
+                    intent.putExtra("clickType", Constants.VIEW_CLICK);
                     startActivity(intent);
 
-                }else if (clickType.equals(Constants.EDIT)){
+                } else if (clickType.equals(Constants.EDIT)) {
                     Intent intent = new Intent(PlaceListActivity.this, MapsActivity.class);
-                    intent.putExtra("address",model.getPlaceAddress());
-                    intent.putExtra("addComponent",model.getAddressComponent());
-                    intent.putExtra("name",model.getPlaceName());
-                    intent.putExtra("clickType",Constants.EDIT);
+                    intent.putExtra("address", model.getPlaceAddress());
+                    intent.putExtra("addComponent", model.getAddressComponent());
+                    intent.putExtra("name", model.getPlaceName());
+                    intent.putExtra("clickType", Constants.EDIT);
                     startActivity(intent);
 
-                }else if (clickType.equals(Constants.DELETE)){
+                } else if (clickType.equals(Constants.DELETE)) {
                     viewmodal.delete(model);
                     Toast.makeText(PlaceListActivity.this, "Place delete", Toast.LENGTH_SHORT).show();
                 }
@@ -276,7 +285,9 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLastLocation();
     }
+
     LatLng currLocation;
+
     private void fetchLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -289,7 +300,7 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    Toast.makeText(PlaceListActivity.this, location.getLatitude() + "" + location.getLongitude(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PlaceListActivity.this, location.getLatitude() + "" + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     currLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                 }
@@ -312,7 +323,7 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
         final RadioButton[] genderradioButton = new RadioButton[1];
         RadioGroup radioGroup;
 
-        radioGroup=(RadioGroup)dialog.findViewById(R.id.radioGroup);
+        radioGroup = (RadioGroup) dialog.findViewById(R.id.radioGroup);
 
         Button dialogButton = (Button) dialog.findViewById(R.id.btn_dialog);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -321,23 +332,22 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
                 placesModels = new ArrayList<>();
                 int selectedId = radioGroup.getCheckedRadioButtonId();
                 genderradioButton[0] = (RadioButton) dialog.findViewById(selectedId);
-                if(selectedId==-1){
-                    Toast.makeText(PlaceListActivity.this,"Nothing selected", Toast.LENGTH_SHORT).show();
-                }
-                else if(genderradioButton[0].getText().equals("Ascending")){
+                if (selectedId == -1) {
+                    Toast.makeText(PlaceListActivity.this, "Nothing selected", Toast.LENGTH_SHORT).show();
+                } else if (genderradioButton[0].getText().equals("Ascending")) {
                     Collections.sort(places, new SortPlaces(currLocation));
-                    for (Place place:places) {
-                        placesModels.add(new PlacesModel(place.getName(),place.getAddress(),"",place.getLatLng().latitude,place.getLatLng().longitude));
+                    for (Place place : places) {
+                        placesModels.add(new PlacesModel(place.getName(), place.getAddress(), "", place.getLatLng().latitude, place.getLatLng().longitude));
                     }
 
                     adapter.submitList(placesModels);
                     adapter.notifyDataSetChanged();
                     Toast.makeText(PlaceListActivity.this, genderradioButton[0].getText(), Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     Collections.sort(places, new SortPlaces(currLocation));
                     Collections.reverse(places);
-                    for (Place place:places) {
-                        placesModels.add(new PlacesModel(place.getName(),place.getAddress(),"",place.getLatLng().latitude,place.getLatLng().longitude));
+                    for (Place place : places) {
+                        placesModels.add(new PlacesModel(place.getName(), place.getAddress(), "", place.getLatLng().latitude, place.getLatLng().longitude));
                     }
 
                     adapter.submitList(placesModels);
@@ -353,10 +363,10 @@ ArrayList<PlacesModel> placesModels = new ArrayList<>();
 
     public void onRoutClick(View view) {
         Intent intent = new Intent(PlaceListActivity.this, MapsActivity.class);
-        intent.putExtra("address","");
-        intent.putExtra("addComponent","");
-        intent.putExtra("name","");
-        intent.putExtra("clickType",Constants.ALL_ROUT);
+        intent.putExtra("address", "");
+        intent.putExtra("addComponent", "");
+        intent.putExtra("name", "");
+        intent.putExtra("clickType", Constants.ALL_ROUT);
         startActivity(intent);
     }
 
