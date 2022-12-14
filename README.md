@@ -18,8 +18,8 @@ Screen 3: Map screen - This will open when the user clicks on the show path from
 The map screen should show markers on the map for all the location sources and draw a path connecting all the sources.
 
 
-Google Place API Enabled Key = *****************************************************
-For reference : https://developers.google.com/maps/documentation/places/android-sdk/get-api-key
+##### Google Place API Enabled Key = *****************************************************
+**For reference :** https://developers.google.com/maps/documentation/places/android-sdk/get-api-key
 
 # ScreenShots
 
